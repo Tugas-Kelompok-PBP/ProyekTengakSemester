@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="card-title">List Ruangan Yang Tersedia</h1>
+                <table class="table" id="ruangan_table">
+                    <!-- Table data will be inserted here -->
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Add New Product</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form" onsubmit="return false;">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="nomor" class="col-form-label">Nomor:</label>
+                            <input type="text" class="form-control" id="nomor" name="nomor"></input>
+                        </div>
+                        <div class="mb-3">
+                            <label for="ketersediaan" class="col-form-label">Ketersediaan:</label>
+                            <input type="text" class="form-control" id="ketersediaan" name="ketersediaan"></input>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function getProducts() {
+            return fetch("{% url 'fitur_premium:get_ruangan_json' %}").then((res) => res.json())
+        }
+        async function refreshProducts() {
+            const table = document.getElementById("ruangan_table");
+            table.innerHTML = "";
+            const products = await getProducts();
+            let htmlString = `<thead>
+                <tr>
+                    <th>Nomor</th>
+                    <th>Ketersediaan</th>
+                </tr>
+                </thead>
+                <tbody>`;
+
+            products.forEach((item) => {
+                htmlString += `<tr>
+                    <td>${item.fields.nomor}</td>
+                    <td>${item.fields.ketersediaan}</td>
+                </tr>`;
+            });
+
+            htmlString += `</tbody>`;
+            table.innerHTML = htmlString;
+        }
+
+        refreshProducts();
+    </script>
+{% endblock content %}
