@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="card-title">Selamat Datang di Manage Buku</h1>
+            </div>
+            <div class="card-body">
+                <table class="table" id="buku_table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Genre</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be inserted here dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function getProducts() {
+            return fetch("{% url 'sistem_manajemen:get_buku_json' %}").then((res) => res.json());
+        }
+
+        async function refreshProducts() {
+            const tableBody = document.querySelector("#buku_table tbody");
+            tableBody.innerHTML = "";
+
+            const products = await getProducts();
+
+            products.forEach((item) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${item.fields.title}</td>
+                    <td>${item.fields.genre}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        refreshProducts();
+    </script>
+{% endblock content %}

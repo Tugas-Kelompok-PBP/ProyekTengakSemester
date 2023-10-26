@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="card-title">Selamat Datang di System Managemen</h1>
+                <div class="card">
+                    <div class="card-body">
+                        <a href="{% url 'sistem_manajemen:sistem_ruangan' %}" class="btn btn-primary btn-block mt-3">Manage Ruangan</a>
+                        <p class="card-text">Kelola informasi tentang ruangan.</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <a href="{% url 'sistem_manajemen:sistem_buku' %}" class="btn btn-primary btn-block mt-3">Manage Buku</a>
+                        <p class="card-text">Kelola informasi tentang buku.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
