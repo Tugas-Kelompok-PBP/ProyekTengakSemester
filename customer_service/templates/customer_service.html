@@ -1,0 +1,31 @@
+{% extends 'base.html' %} {% block content %}
+<h1>Bantuan</h1>
+<table id="reports"></table>
+
+<script>
+    async function getProducts() {
+        return fetch("{% url 'customer_service:get_reports_json' %}").then((res) => res.json())
+    }
+
+    async function refreshProducts() {
+        document.getElementById("reports").innerHTML = ""
+        const products = await getProducts()
+        let htmlString = `<tr>
+            <th>Judul</th>
+            <th>Tanggal Peminjaman</th>
+            <th>Tanggal Laporan</th>
+            <th>Pesan<th>
+        </tr>`
+        products.forEach((item) => {
+            htmlString += `\n<tr class="isi-tabel {% if forloop.last %}produk-terakhir{% endif %}">
+            <td class="judul">${item.fields.type}</td>
+            <td class="tanggal">${item.fields.date}</td>
+            <td class="tanggal">${item.fields.report_date}</td>
+            <td class="pesan">${item.fields.message}</td>
+        </tr>`
+        })
+        document.getElementById("reports").innerHTML = htmlString
+    }
+    refreshProducts()
+</script>
+{% endblock content %}
