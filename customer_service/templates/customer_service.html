@@ -1,15 +1,35 @@
 {% extends 'base.html' %} {% block content %}
 <h1>Bantuan</h1>
 <table id="reports"></table>
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Laporan Buku</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form" onsubmit="return false;">
+                    {% csrf_token %}
+                    <table id="borrows"></table>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary" id="button_add" data-bs-dismiss="modal">Buat Laporan</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
-    async function getProducts() {
+    async function getReports() {
         return fetch("{% url 'customer_service:get_reports_json' %}").then((res) => res.json())
     }
 
-    async function refreshProducts() {
+    async function refreshReports() {
         document.getElementById("reports").innerHTML = ""
-        const products = await getProducts()
+        const products = await getReports()
         let htmlString = `<tr>
             <th>Judul</th>
             <th>Tanggal Peminjaman</th>
@@ -26,6 +46,55 @@
         })
         document.getElementById("reports").innerHTML = htmlString
     }
-    refreshProducts()
-</script>
-{% endblock content %}
+    refreshReports()
+
+    async function getBorrows() {
+        return fetch("{% url 'customer_service:get_borrows_json' %}").then((res) => res.json())
+    }
+
+    async function refreshBorrows() {
+        document.getElementById("borrows").innerHTML = ""
+        const products = await getReports()
+        let htmlString = `<tr>
+            <th>Judul</th>
+            <th>Tanggal Peminjaman</th>
+            <th>Pilihan</th>
+        </tr>`
+        products.forEach((item) => {
+            htmlString += `\n<tr class="isi-tabel">
+            <td class="judul">${item.fields.type}</td>
+            <td class="tanggal">${item.fields.date}</td>
+            <select class="status" id="status_{{ book.id }}">
+                <option value="">Opsi</option>
+                <option value="broken">Rusak</option>
+                <option value="lost">Hilang</option>
+            </select>
+        </tr>`
+        })
+        document.getElementById("borrows").innerHTML = htmlString
+    }
+    refreshBorrows()
+
+    function addReport() {
+        var losts = [];
+        var brokens = [];
+        var selectElements = document.querySelectorAll(".status");
+        selectElements.forEach(function(select) {
+            if (select.value === "lost") {
+                losts.push(select);
+            } else if (select.value === "broken") {
+                brokens.push(select);
+            }
+        });
+        var formData = new FormData(document.querySelector('#form'));
+        formData.append('losts', JSON.stringify(losts));
+        formData.append('brokens', JSON.stringify(brokens));
+        fetch("{% url 'customer_service:add_report' %}", {
+            method: "POST",
+            body: formData,
+        }).then(refreshBorrows)
+        document.getElementById("form").reset()
+        return false
+    }
+    document.getElementById("button_add").onclick = addReport
+</script>{% endblock content %}
