@@ -45,9 +45,9 @@ def add_report(request):
         return HttpResponse(b"CREATED", status=201)
     return HttpResponseNotFound()
 
-# def get_reports_json(request):
-#     book_reports = BookReport.objects.filter(user=request.user)
-#     room_reports = RoomReport.objects.filter(user=request.user)
-#     # Combine the two querysets
-#     combined_reports = list(chain(book_reports, room_reports))
-#     return HttpResponse(serializers.serialize('json', combined_reports))
+def add_complaint(request):
+    if request.method == 'POST':
+        user = request.user
+        description = request.POST.get("description")
+        new_complaint = Complaint(user=user, description=description)
+        new_complaint.save()

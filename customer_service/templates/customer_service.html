@@ -81,9 +81,9 @@
         var selectElements = document.querySelectorAll(".status");
         selectElements.forEach(function(select) {
             if (select.value === "lost") {
-                losts.push(select);
+                losts.push(select.id.split("_")[1]);
             } else if (select.value === "broken") {
-                brokens.push(select);
+                brokens.push(select.id.split("_")[1]);
             }
         });
         var formData = new FormData(document.querySelector('#form'));
