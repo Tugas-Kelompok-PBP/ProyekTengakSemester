@@ -27,3 +27,5 @@ Anda dapat mengakses dataset katalog buku yang kami gunakan di [Kaggle - Book Ge
 - **Pengguna Biasa**: Pengguna yang dapat membaca buku, membaca ulasan, menambah ulasan, dan meminjam buku.
 - **Pengguna Premium**: Pengguna yang dapat membaca buku, membaca ulasan, menambah ulasan, meminjam buku, mengakses buku-buku khusus, menyewa ruangan, dan memiliki batas durasi peminjaman yang lebih lama.
 - **Pegawai**: Pegawai yang dapat mengakses fitur manajemen perpustakaan.
+
+xxxyyyzzz
