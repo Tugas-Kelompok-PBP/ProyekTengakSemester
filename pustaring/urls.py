@@ -23,5 +23,6 @@ urlpatterns = [
     path('sistem_manajemen/', include("sistem_manajemen.urls")),
     path('fitur_premium/', include("fitur_premium.urls")),
     path('customer_service/', include("customer_service.urls")),
-    path('', include("beranda.urls"))
+    path('', include("beranda.urls")),
+    path('ulasan/', include("ulasan.urls"))
 ]

@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="card-title">Informasi Buku</h1>
+                <h2>Judul: {{ book.title }}</h2>
+                <p>Genre: {{ book.genre }}</p>
+                <p>Ringkasan: {{ book.summary }}</p>
+            </div>
+        </div>
+    </div>
+
+    <h3>Ulasan Pengguna</h3>
+    {% for review in reviews %}
+    <div id="user-review">
+        <p>Oleh: {{ review.user_name }}</p>
+        <p>Rating: {{ review.rating }} out of 5</p>
+        <p>Ulasan: {{ review.review_text }}</p>
+    </div>
+    {% endfor %}
+
+    <!-- Formulir untuk menambahkan ulasan -->
+    <h3>Tambahkan Ulasan Anda</h3>
+    <form id ="review_form" method="post">
+        {% csrf_token %}
+        <label for="user_name">Nama Anda:</label>
+        <input type="text" id="user_name" name="user_name" required>
+        <label for="rating">Rating:</label>
+        <select id="rating" name="rating" required>
+            <option value="5">★★★★★</option>
+            <option value="4">★★★★☆</option>
+            <option value="3">★★★☆☆</option>
+            <option value="2">★★☆☆☆</option>
+            <option value="1">★☆☆☆☆</option>
+        </select>
+        <label for="review_text">Ulasan Anda:</label>
+        <textarea id="review_text" name="review_text" required></textarea>
+        <button type="submit">Kirim Ulasan</button>
+    </form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const bookId = "{{ book.id }}";
+    console.log("Book ID:", bookId); // Add this line to check the value
+
+    if (bookId) {
+        async function getReviews() {
+            return fetch(`/reviews-json/${bookId}/`).then((res) => res.json());
+        }
+
+        async function refreshReviews() {
+            const reviewContainer = document.getElementById("user-reviews");
+            reviewContainer.innerHTML = "Loading reviews...";
+
+            const reviews = await getReviews();
+            let htmlString = "<ul>";
+
+            reviews.forEach((review) => {
+                htmlString += `
+                    <li>
+                        <p>Oleh: ${review.fields.user_name}</p>
+                        <p>Rating: ${review.fields.rating} out of 5</p>
+                        <p>Ulasan: ${review.fields.review_text}</p>
+                    </li>`;
+            });
+
+            htmlString += "</ul>";
+            reviewContainer.innerHTML = htmlString;
+        }
+
+        const reviewForm = document.getElementById("review_form");
+
+        reviewForm.addEventListener("submit", async function (event) {
+            event.preventDefault(); // Mencegah pengiriman formulir otomatis
+
+            const user_name = document.getElementById("user_name").value;
+            const rating = document.getElementById("rating").value;
+            const review_text = document.getElementById("review_text").value;
+
+            const data = {
+                user_name: user_name,
+                rating: rating,
+                review_text: review_text,
+            };
+
+            // Kirim permintaan POST ke endpoint yang sesuai
+            try {
+                const response = await fetch(`/add-review/${bookId}/`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": getCookie("csrftoken"), // Ambil token CSRF
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                if (response.status === 201) {
+                    // Ulasan berhasil ditambahkan, Anda dapat memuat ulasan lagi atau melakukan tindakan lain
+                    refreshReviews();
+                } else {
+                    console.error("Gagal menambahkan ulasan.");
+                }
+            } catch (error) {
+                console.error("Kesalahan dalam pengiriman permintaan: ", error);
+            }
+        });
+
+        // Fungsi untuk mengambil token CSRF dari cookie
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== "") {
+                var cookies = document.cookie.split(";");
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === name + "=") {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        refreshReviews(); // Untuk memuat ulasan saat halaman dimuat
+    }
+});
+
+</script>
+{% endblock content %}
