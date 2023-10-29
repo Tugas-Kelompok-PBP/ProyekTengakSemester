@@ -1,14 +1,6 @@
 {% extends 'base.html' %} {% block content %}
 <h1>Bantuan</h1>
 <div id="reports"></div>
-{% for report in reports %}
-<!-- <div class="card border-primary mb-3" style="max-width: 18rem;">
-    <div class="card-body text-primary">
-        <h5 class="card-title">Laporan {{report.pk}}</h5>
-        <p class="card-text">{{report.message}}</p>
-    </div>
-</div> -->
-{% endfor %}
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#bookReportModal">Laporan</button>
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#complaintModal">Aduan/Saran</button>
 <div class="modal fade" id="bookReportModal" tabindex="-1" aria-labelledby="bookReportModalLabel" aria-hidden="true">
@@ -20,19 +12,18 @@
             </div>
             <div class="modal-body">
                 <form id="form" onsubmit="return false;">
-                    {% csrf_token %} {% for book in books %}
+                    {% csrf_token %} {% for book in borrowed.book reversed %}
                     <div class="card border-primary mb-3" style="max-width: 18rem;">
                         <div class="card-body text-primary">
                             <h5 class="card-title">{{book.title}}</h5>
                             <p class="card-text">
-                                Tangal Peminjaman
+                                Tangal Peminjaman: {{borrowed.tanggal_peminjaman}}
                             </p>
                             <select class="status" id={{book.pk}}>
                                 <option value="">Opsi</option>
                                 <option value="broken">Rusak</option>
                                 <option value="lost">Hilang</option>
                             </select>
-                            <p>{{book.pk}}</p>
                         </div>
                     </div>
                     {% endfor %}
@@ -74,28 +65,25 @@
     }
 
     async function getBooksByIds(ids) {
-        return fetch(`{% url 'customer_service:get_books_json_by_ids' %}?ids=ids.join(',')`).then((res) => res.json());
+        return fetch(`{% url 'customer_service:get_books_json_by_ids' %}?ids=ids`).then((res) => res.json());
     }
 
     async function refreshReports() {
         document.getElementById("reports").innerHTML = ""
         const reports = await getReports()
-        let htmlString = ''
+        let htmlString = ``
         reports.forEach((report) => {
-            htmlString += `\n<div class="card border-primary mb-3" style="max-width: 18rem;">
-            <div class="card-body text-primary">
-                <h5 class="card-title">Laporan ${report.pk}</h5>
-                <p class="card-text">${report.fields.message}</p>
-            </div>
-        </div>`
+            htmlString += `\n<div class="card border-primary mb-3" style="width: 12rem; text-align: center">
+                <div class="card-body text-primary">
+                    <h5 class="card-title">Laporan ${report.pk}</h5>
+                    <h7 class="card-text">${report.fields.report_date}</h7>
+                    <p class="card-text">${report.fields.message}</p>
+                </div>
+            </div>`
         })
         document.getElementById("reports").innerHTML = htmlString
     }
     refreshReports()
-
-    async function getBorrows() {
-        return fetch("{% url 'customer_service:get_borrows_json' %}").then((res) => res.json())
-    }
 
     function addReport() {
         var losts = [];

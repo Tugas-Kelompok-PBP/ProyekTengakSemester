@@ -1,0 +1,48 @@
+{% extends 'base.html' %} {% block content %}
+
+<h1>Laporan</h1>
+<div id="reports"></div>
+
+<script>
+    async function getReports() {
+        return fetch("{% url 'customer_service:get_all_reports_json' %}").then((res) => res.json())
+    }
+
+    async function refreshReports() {
+        document.getElementById("reports").innerHTML = ""
+        const reports = await getReports()
+        let htmlString = ``
+        reports.forEach((report) => {
+            htmlString += `\n<div class="card border-primary mb-3" style="width: 12rem; text-align: center">
+                <div class="card-body text-primary">
+                    <h5 class="card-title">${report.user.username}</h5>
+                    <h6 class="card-text">Laporan ${report.pk}</h6>
+                    <h7 class="card-text">${report.fields.report_date}</h7>`
+            if (report.fields.status === 'REQUESTED') {
+                htmlString += `\n        <button type="button" class="btn btn-primary" id="button_add" data-bs-dismiss="modal" onClick="confirm(${report.pk})">Konfirmasi</button>`
+            } else if (report.fields.status === 'CONFIRMED') {
+                htmlString += `\n        <button type="button" class="btn btn-primary" id="button_add" data-bs-dismiss="modal onClick="finish(${report.pk})">Selesai</button>`
+            }
+            htmlString += `\n    </div>
+            </div>`
+        })
+        document.getElementById("reports").innerHTML = htmlString
+    }
+    refreshReports()
+
+    async function confirm(id) {
+        fetch("{% url 'customer_service:confirm_report'?id=${id} %}", {
+            method: POST
+        })
+        refreshReports()
+    }
+
+    async function finish(id) {
+        fetch("{% url 'customer_service:finish_report'?id=${id} %}", {
+            method: POST
+        })
+        refreshReports()
+    }
+</script>
+
+{% endblock content %}
