@@ -1,6 +1,14 @@
 {% extends 'base.html' %} {% block content %}
 <h1>Bantuan</h1>
 <div id="reports"></div>
+{% for report in reports %}
+<!-- <div class="card border-primary mb-3" style="max-width: 18rem;">
+    <div class="card-body text-primary">
+        <h5 class="card-title">Laporan {{report.pk}}</h5>
+        <p class="card-text">{{report.message}}</p>
+    </div>
+</div> -->
+{% endfor %}
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#bookReportModal">Laporan</button>
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#complaintModal">Aduan/Saran</button>
 <div class="modal fade" id="bookReportModal" tabindex="-1" aria-labelledby="bookReportModalLabel" aria-hidden="true">
@@ -72,19 +80,14 @@
     async function refreshReports() {
         document.getElementById("reports").innerHTML = ""
         const reports = await getReports()
-        let htmlString = ``
-        reports.forEach((item) => {
-            //            let subHtmlString = ``
-            //            const books = getBooksByIds(item.losts.concat(item.brokens));
-            //            books.forEach((book) => {
-            //                subHtmlString += `\n        <p>${book.fields.title}</p>`;
-            //            })
+        let htmlString = ''
+        reports.forEach((report) => {
             htmlString += `\n<div class="card border-primary mb-3" style="max-width: 18rem;">
-                <div class="card-body text-primary">
-                    <h5 class="card-title">Laporan Buku</h5>
-                    <p class="card-text">${item.field.message}</p>
-                </div>
-            </div>`
+            <div class="card-body text-primary">
+                <h5 class="card-title">Laporan ${report.pk}</h5>
+                <p class="card-text">${report.fields.message}</p>
+            </div>
+        </div>`
         })
         document.getElementById("reports").innerHTML = htmlString
     }

@@ -11,7 +11,7 @@ class Report(models.Model):
     brokens = models.TextField(blank=True, null=True)
     report_date = models.DateField(auto_now_add=True)
     status = models.CharField(max_length=12, choices=STATUS)
-    message = models.CharField(blank=True, max_length=50)
+    message = models.TextField()
 
     def set_losts(self, losts):
         self.losts = json.dumps(losts)

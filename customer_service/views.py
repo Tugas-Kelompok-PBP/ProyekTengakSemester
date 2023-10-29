@@ -17,7 +17,7 @@ from itertools import chain #Combining Different Models
 
 @login_required(login_url='/login')
 def show_customer_service(request):
-    context = {'books': Book.objects.all()}
+    context = {'books': Book.objects.all(), 'reports': Report.objects.all()}
     return render(request, "customer_service.html", context)
 
 def show_customer_servicer(request):
