@@ -11,8 +11,6 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 
-from itertools import chain #Combining Different Models
-
 @login_required(login_url='/login')
 def show_customer_service(request):
     context = {'borrowed': PinjamBuku.objects.filter(pengguna=request.user)}
