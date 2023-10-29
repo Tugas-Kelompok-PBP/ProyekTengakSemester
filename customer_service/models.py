@@ -4,7 +4,7 @@ from book.models import Book
 from sistem_manajemen.models import Ruangan
 from django.contrib.auth.models import User
 
-class BookReport(models.Model):
+class Report(models.Model):
     STATUS = [("UNDONE", "Undone"), ("SEMI-DONE", "Semi-done"), ("DONE", "Done")]
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     losts = models.TextField(blank=True, null=True)  # Store as JSON string

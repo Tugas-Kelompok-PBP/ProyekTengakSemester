@@ -1,6 +1,6 @@
 {% extends 'base.html' %} {% block content %}
 <h1>Bantuan</h1>
-<table id="reports"></table>
+<div id="reports"></div>
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#bookReportModal">Laporan</button>
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#complaintModal">Aduan/Saran</button>
 <div class="modal fade" id="bookReportModal" tabindex="-1" aria-labelledby="bookReportModalLabel" aria-hidden="true">
@@ -19,7 +19,7 @@
                             <p class="card-text">
                                 Tangal Peminjaman
                             </p>
-                            <select class="status" id="status_{{book.pk}}">
+                            <select class="status" id={{book.pk}}>
                                 <option value="">Opsi</option>
                                 <option value="broken">Rusak</option>
                                 <option value="lost">Hilang</option>
@@ -100,11 +100,15 @@
         var selectElements = document.querySelectorAll(".status");
         selectElements.forEach(function(select) {
             if (select.value === "lost") {
-                losts.push(parseInt(select.id.split("_")[1]));
+                losts.push(parseInt(select.id));
             } else if (select.value === "broken") {
-                brokens.push(parseInt(select.id.split("_")[1]));
+                brokens.push(parseInt(select.id));
             }
         });
+        if (losts.length === 0 && brokens.length === 0) {
+            $('#bookReportModal').modal('hide');
+            return false;
+        }
         fetch("{% url 'customer_service:add_report' %}", {
             method: "POST",
             body: JSON.stringify({

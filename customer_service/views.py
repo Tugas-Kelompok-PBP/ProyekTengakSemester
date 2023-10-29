@@ -4,7 +4,7 @@ from book.models import Book
 from book.views import get_books
 #from beranda.models import User
 #from peminjaman_buku.models import PinjamBuku
-from customer_service.models import BookReport, Complaint
+from customer_service.models import Report, Complaint
 from django.urls import reverse
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.core import serializers
@@ -21,10 +21,10 @@ def show_customer_service(request):
     return render(request, "customer_service.html", context)
 
 def show_customer_servicer(request):
-    reports = BookReport.objects.all()
+    reports = Report.objects.all()
 
 def get_reports_json(request):
-    reports = BookReport.objects.all()
+    reports = Report.objects.all()
     return HttpResponse(serializers.serialize('json', reports))
 
 def get_books_json_by_ids(request, ids):
@@ -40,11 +40,11 @@ def add_report(request):
     if request.method == 'POST':
         user = request.user
         data = json.loads(request.body)
-        losts = json.dumps(data.get('losts', []))
-        brokens = json.dumps(data.get('brokens', []))
+        losts = data.get('losts', [])
+        brokens = data.get('brokens', [])
         status = 'UNDONE'
         message = 'Laporan diajukan'
-        new_report = BookReport(user=user, status=status, message=message)
+        new_report = Report(user=user, status=status, message=message)
         new_report.set_losts(losts)
         new_report.set_brokens(brokens)
         new_report.save()
@@ -61,5 +61,5 @@ def add_complaint(request):
     return HttpResponseNotFound()
 
 def show_json(request):
-    data = BookReport.objects.all()
+    data = Report.objects.all()
     return HttpResponse(serializers.serialize("json", data), content_type="application/json")
