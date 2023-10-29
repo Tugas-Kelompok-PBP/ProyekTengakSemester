@@ -86,11 +86,7 @@
     <div>
         <h1 class="page-title">DAFTAR BUKU YANG TERSEDIA</h1>
         <div style="display: flex; justify-content: center; align-items: center; flex-direction: row;">
-            <a href="{% url 'peminjaman_buku:kembalikan_buku' %}">
-                <button class="btn">
-                    Kembalikan buku
-                </button>
-            </a>
+           
 
             <a href="{% url 'peminjaman_buku:pinjam_buku_list' %}">
                 <button class="btn">
@@ -133,14 +129,14 @@
     }
     
     async function pinjamBuku(bookId) {
-        openPopup();
-
+        
         try {
             const baseUrl = "{% url 'peminjaman_buku:pinjam_buku' 0 %}";
             const response = await fetch(`${baseUrl.replace('0', bookId)}`);
-
+            
             if (response.ok) {
                 const data = await response.json();
+                openPopup();
                 console.log("success");
 
             } else {

@@ -54,10 +54,17 @@ def create_product(request):
 from django.shortcuts import render
 
 def show_peminjaman_buku(request):
-    books = Book.objects.filter(ketersediaan='tersedia')
+    current_user = request.user.username
+
+    # Periksa apakah pengguna adalah VIP
+    if current_user.endswith('-vip'):
+        books = Book.objects.filter(ketersediaan='tersedia')
+    else:
+        books = Book.objects.filter(ketersediaan='tersedia', vip='biasa')
 
     context = {
         'books': books,
     }
-    
-    return render(request,'peminjaman_buku.html', context)
+
+    return render(request, 'peminjaman_buku.html', context)
+   
