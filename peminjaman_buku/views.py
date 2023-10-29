@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import redirect
 from .models import PinjamBuku
 from book.models import Book
+from ulasan.models import UserReview
 from django.contrib.auth.decorators import login_required
 import datetime  
 from django.shortcuts import render, redirect, get_object_or_404
@@ -56,3 +57,14 @@ def pinjam_buku_list(request):
 
     return render(request, 'pinjam_buku_list.html', context)
 
+def show_ulasan(request, book_id=None):
+    book = None
+    reviews = None
+    if book_id is not None:
+        try:
+            book = Book.objects.get(pk=book_id)
+            reviews = UserReview.objects.filter(book=book)
+        except Book.DoesNotExist:
+            # Tangani jika buku tidak ditemukan
+            book = None
+    return render(request, "ulasan.html", {'book': book, 'reviews': reviews})
