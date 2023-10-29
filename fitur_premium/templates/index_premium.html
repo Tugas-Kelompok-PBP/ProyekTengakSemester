@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="container bg-success" style="margin-bottom:20px; margin-top:50px; padding:20px;">
+            <h1 class="text-center text-white">Beranda Premium</h1>
+        </div>
+    <!-- Button trigger modal -->
+          
+        <div class="card">
+            <div class="card-header">
+                <h1 class="card-title">Nikmati Akses Buku VIP</h1>
+            </div>
+            <div class="card-body">
+                <table class="table" id="buku_table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Genre</th>
+                            <th>Sewa</th>
+                            <th>#</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be inserted here dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="card-title">Buku lainnya yang bisa anda baca</h1>
+            </div>
+            <div class="card-body">
+                <table class="table" id="buku_free">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Genre</th>
+                            <th>Sewa</th>
+                            <th>#</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be inserted here dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Sewa Ruangan</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                <label for="">Ruangan</label>
+                <select name="" id="" class="form-control">
+                    {{ data_ruangan }}
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+          </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="sewa" tabindex="-1" aria-labelledby="sewaLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="sewaLabel">Sewa Buku</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="form" onsubmit="return false;">
+            {% csrf_token %}
+            <div class="modal-body">
+              <input type="hidden" id="title" name="title" >
+              <div class="form-group">
+                <label for="">Jumlah Hari</label>
+                <select name="jumlah_hari" id="" class="form-control">
+                    <option value="1">1 Hari</option>
+                    <option value="2">2 Hari</option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary">Save changes</button>
+            </div>
+            </form>
+          </div>
+        </div>
+    </div>
+
+
+    <script>
+        async function getBookPremium() {
+            return fetch("{% url 'fitur_premium:get_buku_premium' %}").then((res) => res.json());
+        }
+
+        async function getFree() {
+            return fetch("{% url 'sistem_manajemen:get_ruangan_json' %}").then((res) => res.json())
+        }
+
+        async function refreshPremium() {
+            const tableBody = document.querySelector("#buku_table tbody");
+            tableBody.innerHTML = "";
+
+            const products = await getBookPremium();
+
+            products.forEach((item) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${item.fields.title}</td>
+                    <td>${item.fields.genre}</td>
+                    <td><button class="btn btn-warning sewa" data-title="${item.fields.title}" data-id="${item.pk}">Sewa</button> </td>
+                    <td> <a href="baca/${item.pk}" class="btn btn-primary btn-block">Baca</a> </td>
+                `;
+                tableBody.appendChild(row);
+            });
+            $('.sewa').on('click',function(){
+                let title = $(this).data("title");
+                $('#title').val(title);
+                $('#sewa').modal('toggle');
+            });
+        }
+
+        async function refreshFreeBook() {
+            const tableBody = document.querySelector("#buku_free tbody");
+            tableBody.innerHTML = "";
+
+            const products = await getBookPremium();
+
+            products.forEach((item) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${item.fields.title}</td>
+                    <td>${item.fields.genre}</td>
+                    <td><button class="btn btn-warning sewa" data-title="${item.fields.title}" data-id="${item.pk}">Sewa</button> </td>
+                    <td> <a href="baca/${item.pk}" class="btn btn-primary btn-block">Baca</a> </td>
+                `;
+                tableBody.appendChild(row);
+            });
+            $('.sewa').on('click',function(){
+                let title = $(this).data("title");
+                $('#title').val(title);
+                $('#sewa').modal('toggle');
+            });
+        }
+
+        refreshFreeBook();
+        refreshPremium();
+    </script>
+    <script>
+    $(document).ready(function () {
+
+        $('#form').on('submit',function(){
+            fetch("{% url 'fitur_premium:add_sewa_buku' %}", {
+                method: "POST",
+                body: new FormData(document.querySelector('#form'))
+            }).then(refreshFreeBook)
+
+            document.getElementById("form").reset();
+            location.reload();
+            return false;
+        });
+
+        
+    });
+    </script>
+{% endblock content %}
