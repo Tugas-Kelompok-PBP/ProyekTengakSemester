@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h1 style="margin: 2; text-align: center;">Daftar Buku yang Dipinjam</h1>
+  </div>
+  <br>
+  <div class="container">
+    <div class="card-container">
+      {% if borrowed_books %}
+        {% for pinjam_buku in borrowed_books %}
+          <div class="card">
+            <h5 class="card-title">{{ pinjam_buku.buku }}</h5>
+            <p class="card-text">Peminjam: {{ pinjam_buku.pengguna.username }}</p>
+            <p class="card-text">Tanggal Peminjaman: {{ pinjam_buku.tanggal_peminjaman }}</p>
+            <p class="card-text">Tanggal Pengembalian: {{ pinjam_buku.tanggal_pengembalian }}</p>
+            <p class="card-text">Status: {% if pinjam_buku.status_acc %}Diterima{% else %}Menunggu persetujuan{% endif %}</p>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p>Anda belum meminjam buku apapun.</p>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

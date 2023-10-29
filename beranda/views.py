@@ -50,3 +50,14 @@ def create_product(request):
         return HttpResponseRedirect(reverse('beranda:show_beranda'))
     context = {'form': form, 'books': Book.objects.all()}
     return render(request, "borrow.html", context)
+
+from django.shortcuts import render
+
+def show_peminjaman_buku(request):
+    books = Book.objects.filter(ketersediaan='tersedia')
+
+    context = {
+        'books': books,
+    }
+    
+    return render(request,'peminjaman_buku.html', context)
