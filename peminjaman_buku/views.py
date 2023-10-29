@@ -5,26 +5,29 @@ from .models import PinjamBuku
 from book.models import Book
 from ulasan.models import UserReview
 from django.contrib.auth.decorators import login_required
-import datetime  # Import the datetime module
+import datetime  
 from django.shortcuts import render, redirect, get_object_or_404
-
-
-
-
 
 @login_required
 def pinjam_buku(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    user = request.user
 
-    book = Book.objects.get(id=book_id)
+    sudah_dipinjam = PinjamBuku.objects.filter(pengguna=user, buku=book.title).exists()
 
-    today = datetime.date.today()
-    tanggal_pengembalian = today + datetime.timedelta(days=2)
+    if sudah_dipinjam:
+        response_data = {'success': False, 'message': 'Anda sudah meminjam buku ini.'}
+    else:
+        book = Book.objects.get(id=book_id)
 
-    # Buat catatan peminjaman buku
-    pinjaman = PinjamBuku(pengguna=request.user, buku=book, tanggal_peminjaman=today, tanggal_pengembalian=tanggal_pengembalian)
-    pinjaman.save()
+        today = datetime.date.today()
+        tanggal_pengembalian = today + datetime.timedelta(days=2)
 
-    response_data = {'success': True}
+        pinjaman = PinjamBuku(pengguna=request.user, buku=book.title, tanggal_peminjaman=today, tanggal_pengembalian=tanggal_pengembalian)
+        pinjaman.save()
+
+        response_data = {'success': True}
+    
 
     return JsonResponse(response_data)
 
