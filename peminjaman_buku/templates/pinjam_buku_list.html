@@ -10,7 +10,7 @@
       {% if borrowed_books %}
         {% for pinjam_buku in borrowed_books %}
           <div class="card">
-            <h5 class="card-title">{{ pinjam_buku.buku }}</h5>
+            <h5 class="card-title">{{ pinjam_buku.buku.title }}</h5>
             <p class="card-text">Peminjam: {{ pinjam_buku.pengguna.username }}</p>
             <p class="card-text">Tanggal Peminjaman: {{ pinjam_buku.tanggal_peminjaman }}</p>
             <p class="card-text">Tanggal Pengembalian: {{ pinjam_buku.tanggal_pengembalian }}</p>

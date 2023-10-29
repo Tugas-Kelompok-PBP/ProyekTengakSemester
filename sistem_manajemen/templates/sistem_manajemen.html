@@ -18,21 +18,15 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel">Add New Product</h1>
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Tambahkan Ruangan</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="form" onsubmit="return false;">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <label for="nomor" class="col-form-label">Nomor:</label>
-                            <input type="text" class="form-control" id="nomor" name="nomor"></input>
-                        </div>
-                        <div class="mb-3">
-                            <label for="ketersediaan" class="col-form-label">Ketersediaan:</label>
-                            <input type="text" class="form-control" id="ketersediaan" name="ketersediaan"></input>
-                        </div>
-                    </form>
+						{% csrf_token %}
+						{{ form.nomor.label_tag }} {{ form.nomor }}<br>
+						{{ form.ketersediaan.label_tag }} {{ form.ketersediaan }}<br>
+					</form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -46,6 +40,7 @@
         async function getProducts() {
             return fetch("{% url 'sistem_manajemen:get_ruangan_json' %}").then((res) => res.json())
         }
+        const baseUrl = "{% url 'sistem_manajemen:edit_ketersediaan' 0 %}";
         async function refreshProducts() {
             const table = document.getElementById("ruangan_table");
             table.innerHTML = "";
@@ -54,6 +49,7 @@
                 <tr>
                     <th>Nomor</th>
                     <th>Ketersediaan</th>
+                    <th></th>
                 </tr>
                 </thead>
                 <tbody>`;
@@ -62,6 +58,13 @@
                 htmlString += `<tr>
                     <td>${item.fields.nomor}</td>
                     <td>${item.fields.ketersediaan}</td>
+                    <td>
+						<a href="${baseUrl.replace('0', item.pk)}">
+							<button class="btn btn-primary">
+								Rubah Status
+							</button>
+						</a>
+					</td>
                 </tr>`;
             });
 
@@ -70,11 +73,13 @@
         }
 
         refreshProducts();
-
+		
         function addProduct() {
+			const form = document.querySelector('#form');
+			const formData = new FormData(form);
             fetch("{% url 'sistem_manajemen:add_ruangan_ajax' %}", {
                 method: "POST",
-                body: new FormData(document.querySelector('#form'))
+                body: formData
             }).then(refreshProducts)
 
             document.getElementById("form").reset();
@@ -82,5 +87,6 @@
         }
 
         document.getElementById("button_add").onclick = addProduct;
+        
     </script>
 {% endblock content %}
