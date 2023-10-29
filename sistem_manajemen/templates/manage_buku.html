@@ -5,6 +5,20 @@
         <div class="card">
             <div class="card-header">
                 <h1 class="card-title">Selamat Datang di Manage Buku</h1>
+                <select id="myDropdown">
+				  <option value="tidak_ada_filter" selected>Silahkan Pilih Filter</option>
+				  <option value="fantasy">fantasy</option>
+				  <option value="science">science</option>
+				  <option value="crime">crime</option>
+				  <option value="history">history</option>
+				  <option value="horror">horror</option>
+				  <option value="thriller">thriller</option>
+				  <option value="psychology">psychology</option>
+				  <option value="romance">romance</option>
+				  <option value="sports">sports</option>
+				  <option value="travel">travel</option>
+				</select>
+				<button type="button" class="btn btn-primary" id="button_filter" data-bs-dismiss="modal">Filter</button>
             </div>
             <div class="card-body">
                 <table class="table" id="buku_table">
@@ -12,6 +26,7 @@
                         <tr>
                             <th>Title</th>
                             <th>Genre</th>
+                            <th>Ketersediaan</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -23,26 +38,30 @@
     </div>
 
     <script>
-        async function getProducts() {
-            return fetch("{% url 'sistem_manajemen:get_buku_json' %}").then((res) => res.json());
+        async function getProducts(hasil_filter) {
+			const baseUrl = "{% url 'sistem_manajemen:get_buku_json' 0 %}";
+            return fetch(`${baseUrl.replace('0', hasil_filter)}`).then((res) => res.json());
         }
 
         async function refreshProducts() {
             const tableBody = document.querySelector("#buku_table tbody");
             tableBody.innerHTML = "";
-
-            const products = await getProducts();
+            let dropdown = document.getElementById("myDropdown");
+            let filter = "tidak_ada_filter";
+			filter = dropdown.value;
+            const products = await getProducts(filter);
 
             products.forEach((item) => {
                 const row = document.createElement("tr");
                 row.innerHTML = `
                     <td>${item.fields.title}</td>
                     <td>${item.fields.genre}</td>
+                    <td>${item.fields.ketersediaan}</td>
                 `;
                 tableBody.appendChild(row);
             });
         }
-
         refreshProducts();
+        document.getElementById("button_filter").onclick = refreshProducts;
     </script>
 {% endblock content %}
