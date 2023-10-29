@@ -108,6 +108,9 @@
                     <p class="card-text">VIP: {{ book.vip }}</p>
                     <p class="card-text">Summary: {{ book.summary|truncatechars:120 }}</p>
                     <button type="submit" class="btn" onclick="pinjamBuku('{{ book.id }}')">Pinjam</button>
+                    <a href="{% url 'peminjaman_buku:show_ulasan' book.id %}">
+                        <button type="submit" class="btn">Lihat Ulasan</button>
+                    </a>>
                     <div class="popup" id="popup">
                         <h2>Buku berhasil dipinjam</h2>
                         <p>Silakan tunggu proses persetujuan admin</p>
