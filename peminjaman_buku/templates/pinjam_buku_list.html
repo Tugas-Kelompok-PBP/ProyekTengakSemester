@@ -56,26 +56,46 @@
 
     .page-title {
       text-align: center;
-      font-size: 2.5rem; /* Adjust the font size as needed */
-      color: #24495E; /* Change the text color */
-      margin: 20px 0; /* Add margin for spacing */
+      font-size: 2.5rem; 
+      color: #24495E; 
+      margin: 20px 0; 
     }
 
     .no-books-message {
-      text-align: center; /* Mengatur teks menjadi tengah */
-      position: absolute; /* Mengubah posisi menjadi absolute */
-      top: 50%; /* Menengahkan secara vertikal */
-      left: 50%; /* Menengahkan secara horizontal */
-      transform: translate(-50%, -50%); /* Menyesuaikan tengah ke titik tengah window */
-      color: black; /* Warna teks */
-      font-size: 1.5rem; /* Ukuran font sesuaikan dengan yang Anda inginkan */
+      text-align: center; 
+      position: absolute; 
+      top: 50%; 
+      left: 50%;
+      transform: translate(-50%, -50%); 
+      color: black;
+      font-size: 1.5rem; 
     }
-
+    .popup {
+      width: 400px;
+      background: white;
+      border: 3px solid #000;
+      border-radius: 10px;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -80%) scale(0.1);
+      text-align: center;
+      padding: 15px;
+      color: #333;
+      visibility: hidden;
+      transition: transform 0.4s, top 0.4s;
+      z-index: 999; 
+  }
+  .open-popup {
+      visibility: visible;
+      top: 50%;
+      transform: translate(-50%, -50%) scale(1);
+  }
 
   </style>
 
   <div>
-    <h1 class="page-title">Daftar Buku yang Dipinjam</h1>
+    <h1 class="page-title">DAFTAR BUKU YANG DIPINJAM</h1>
   </div>
   <br>
   <div class="container">
@@ -84,15 +104,18 @@
         {% if borrowed_books %}
           {% for pinjam_buku in borrowed_books %}
             <div class="card">
-              <h5 class="card-title">{{ pinjam_buku.buku.title }}</h5>
+              <h5 class="card-title">{{ pinjam_buku.buku }}</h5>
               <p class="card-text">Peminjam: {{ pinjam_buku.pengguna.username }}</p>
               <p class="card-text">Tanggal Peminjaman: {{ pinjam_buku.tanggal_peminjaman }}</p>
               <p class="card-text">Tanggal Pengembalian: {{ pinjam_buku.tanggal_pengembalian }}</p>
               <p class="card-text">Status: {% if pinjam_buku.status_acc %}Diterima{% else %}Menunggu persetujuan{% endif %}</p>
               <a href="{% url 'peminjaman_buku:kembalikan_buku' pinjam_buku.id %}">
-                <button class="btn">
-                  Kembalikan
-                </button>
+                <button class="btn" onclick="openPopup()">Kembalikan</button>
+                <div class="popup" id="popup">
+                  <h2>Buku berhasil dikembalikan</h2>
+                  <p>Terima kasih dan semangat membaca!</p>
+                  <button type="button" class="btn" onclick="closePopup()">OK</button>
+              </div>
               </a>
             </div>
           {% endfor %}
@@ -102,4 +125,16 @@
       </div>
     </div>
   </div>
+  <script>
+    let popup = document.getElementById("popup");
+
+    function openPopup() {
+        popup.classList.add("open-popup");
+        event.preventDefault();
+    }
+
+    function closePopup() {
+        popup.classList.remove("open-popup");
+    }
+  </script>
 {% endblock %}
