@@ -5,6 +5,7 @@ from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponseNotFound
 from book.models import Book
+from peminjaman_buku.models import PinjamBuku
 from django.http import HttpResponseNotFound
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -31,6 +32,7 @@ def show_sistem_ruangan(request):
     context = {
         'products':ruangan,
         'form': form,
+        'name':request.user.username,
     }
     return render(request, "sistem_manajemen.html", context)
 
@@ -39,6 +41,7 @@ def show_sistem_buku(request):
     if(request.user.username.split("-")[-1] != "pekerja"):
         return HttpResponse(b"Restricted")
     context = {
+        'name':request.user.username,
     }
     return render(request, "manage_buku.html", context)
 
@@ -73,3 +76,32 @@ def ganti_status_ketersediaan(request, id):
     ruangan.save()
     return HttpResponseRedirect(reverse('sistem_manajemen:sistem_ruangan'))
 
+@login_required(login_url='/login')
+def show_peminjaman(request):
+    if(request.user.username.split("-")[-1] != "pekerja"):
+        return HttpResponse(b"Restricted")
+    peminjaman = PinjamBuku.objects.all()
+    context = {
+        'products':peminjaman,
+        'name':request.user.username,
+    }
+    return render(request, "peminjaman_manajemen.html", context)
+
+def get_peminjaman_json(request):
+    pinjam = PinjamBuku.objects.all()
+    return HttpResponse(serializers.serialize('json', pinjam))
+
+def ganti_status_peminjaman(request, id):
+    pinjam = PinjamBuku.objects.get(pk=id)
+    pinjam.status_acc = True
+    pinjam.save()
+    return HttpResponseRedirect(reverse('sistem_manajemen:show_peminjaman'))
+
+def ganti_status_ketersediaan_buku(request, id):
+    buku = Book.objects.get(pk=id)
+    if(buku.ketersediaan == "tersedia") :
+        buku.ketersediaan = "dipinjam"
+    else:
+        buku.ketersediaan = "tersedia"
+    buku.save()
+    return HttpResponseRedirect(reverse('sistem_manajemen:sistem_buku'))
