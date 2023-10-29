@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% block meta %}
+
+{% endblock meta %}
+
+{% block content %}
+<head>
+    <title>Edit Review</title>
+</head>
+<body>
+    <h1>Edit Your Review</h1>
+    
+    <form method="post" id="edit-review-form">
+        {% csrf_token %}
+        <label for="rating">Rating:</label>
+        <input type="number" name="rating" id="rating" value="{{ review.rating }}">
+        
+        <label for="review_text">Review Text:</label>
+        <textarea name="review_text" id="review_text">{{ review.review_text }}</textarea>
+        
+        <button type="submit">Save Changes</button>
+    </form>
+    
+    <a href="{% url 'ulasan:show_ulasan' review.book.id %}">Back to Book Details</a>
+</body>
+{% endblock content %}

@@ -6,6 +6,7 @@ class UserReview(models.Model):
     user_name = models.CharField(max_length=50)
     rating = models.IntegerField()
     review_text = models.TextField()
-
+    date_added = models.DateField(auto_now_add=True)
+    
     def __str__(self):
         return f"Review by {self.user_name} for {self.book.title}"
