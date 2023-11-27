@@ -13,7 +13,7 @@ from django.contrib.auth.models import User
 
 @login_required(login_url='/login')
 def show_customer_service(request):
-    context = {'borrowed': PinjamBuku.objects.filter(pengguna=request.user)}
+    context = {'borrowed': Book.objects.all()}
     return render(request, "customer_service.html", context)
 
 def show_customer_servicer(request):
