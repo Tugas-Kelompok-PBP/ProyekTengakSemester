@@ -57,14 +57,6 @@ def pinjam_buku_list(request):
 
     return render(request, 'pinjam_buku_list.html', context)
 
-def show_ulasan(request, book_id=None):
-    book = None
-    reviews = None
-    if book_id is not None:
-        try:
-            book = Book.objects.get(pk=book_id)
-            reviews = UserReview.objects.filter(book=book)
-        except Book.DoesNotExist:
-            # Tangani jika buku tidak ditemukan
-            book = None
-    return render(request, "ulasan.html", {'book': book, 'reviews': reviews})
+def show_detail(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    return render(request, 'detail_buku.html', {'book': book})

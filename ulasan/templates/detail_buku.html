@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="card-title">Informasi Buku</h1>
+                <h2>Judul: {{ book.title }}</h2>
+                <h3>Genre: {{ book.genre }}</h3>
+                {% if book.ketersediaan %}
+                    <h3>Ketersediaan: Tersedia </h3>
+                {% else %}
+                    <h3>Ketersediaan: Tidak tersedia </h3>
+                {% endif %}
+                <p>Ringkasan: {{ book.summary }}</p>
+                
+                <a href="{% url 'beranda:show_peminjaman_buku' %}">
+                    <button class="btn btn-secondary">
+                        Back
+                    </button>
+                </a>
+                <a href="{% url 'ulasan:show_ulasan' book.id %}">
+                    <button class="btn btn-primary">
+                        Lihat Ulasan
+                    </button>
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

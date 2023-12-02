@@ -2,7 +2,7 @@ from django.db import models
 from book.models import Book
 # Create your models here.
 class UserReview(models.Model):
-    book = models.OneToOneField(Book, on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
     user_name = models.CharField(max_length=50)
     rating = models.IntegerField()
     review_text = models.TextField()
