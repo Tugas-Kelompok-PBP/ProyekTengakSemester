@@ -1,7 +1,9 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth.models import User
-from .models import Ruangan, Book, PinjamBuku
+from sistem_manajemen.models import Ruangan
+from book.models import Book
+from peminjaman_buku.models import PinjamBuku
 from .forms import RuanganForm
 
 class SistemManajemenViewTests(TestCase):
