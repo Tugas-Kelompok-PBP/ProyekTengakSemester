@@ -11,6 +11,8 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from sistem_manajemen.forms import RuanganForm
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+import json
 
 # Create your views here.
 @login_required(login_url='/login')
@@ -56,7 +58,7 @@ def get_ruangan_json(request):
     ruangan = Ruangan.objects.all()
     return HttpResponse(serializers.serialize('json', ruangan))
 
-@csrf_exempt
+#@csrf_exempt
 def add_ruangan_ajax(request):
     if request.method == 'POST':
         form = RuanganForm(request.POST)
@@ -105,3 +107,20 @@ def ganti_status_ketersediaan_buku(request, id):
         buku.ketersediaan = "tersedia"
     buku.save()
     return HttpResponseRedirect(reverse('sistem_manajemen:sistem_buku'))
+
+@csrf_exempt
+def create_ruangan_flutter(request):
+    if request.method == 'POST':
+        
+        data = json.loads(request.body)
+
+        new_product = Ruangan.objects.create(
+            nomor = int(data["nomor"]),
+            ketersediaan = data["ketersediaan"]
+        )
+
+        new_product.save()
+
+        return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
