@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import get_object_or_404, render
 from ulasan.forms import BookForm
 from ulasan.models import UserReview
@@ -73,5 +74,37 @@ def add_review_ajax(request, book_id):
                 return JsonResponse({'status': 'error', 'message': 'Rating tidak boleh kosong.'})
         except ValueError:
             return JsonResponse({'status': 'error', 'message': 'Rating harus berupa angka.'})
+    else:
+        return HttpResponseNotFound()
+
+@csrf_exempt
+def create_review_flutter(request, id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+
+        user_name = request.user.username if request.user.is_authenticated else "AnonymousUser"
+        rating = data.get("rating")
+        review_text = data.get("review_text")
+        book = get_object_or_404(Book, id=id)
+
+        try:
+            # Perform any necessary validation on the data here
+            # ...
+
+            # Create a new UserReview instance
+            review = UserReview.objects.create(
+                book=book,
+                user_name=user_name,
+                rating=int(rating),
+                review_text=review_text,
+            )
+
+            return JsonResponse({"status": "success"}, status=201)
+
+        except KeyError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid data format.'}, status=400)
+        except ValueError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid data format or values.'}, status=400)
+
     else:
         return HttpResponseNotFound()
