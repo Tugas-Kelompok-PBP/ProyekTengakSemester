@@ -5,13 +5,14 @@ from .models import PinjamBuku
 from book.models import Book
 from ulasan.models import UserReview
 from django.contrib.auth.decorators import login_required
-import datetime  
+from datetime import datetime, timedelta
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.http import HttpResponseNotFound
 from django.http import HttpResponseNotFound
 from django.http import HttpResponseRedirect
 from django.core import serializers
+from datetime import datetime, timedelta
 
 from .models import PinjamBuku
 
@@ -32,8 +33,8 @@ def pinjam_buku(request, book_id):
     else:
         book = Book.objects.get(id=book_id)
 
-        today = datetime.date.today()
-        tanggal_pengembalian = today + datetime.timedelta(days=2)
+        today = datetime.now()
+        tanggal_pengembalian = datetime.now() + timedelta(days=2)
 
         pinjaman = PinjamBuku(pengguna=request.user, buku=book.title, tanggal_peminjaman=today, tanggal_pengembalian=tanggal_pengembalian)
         pinjaman.save()
@@ -50,21 +51,11 @@ def kembalikan_buku(request, pinjam_buku_title):
         print(request.path)
         pinjam_buku = PinjamBuku.objects.all()
         for pb in pinjam_buku:
+            print(pb.buku + "Test")
             if pb.buku == pinjam_buku_title:
                 pb.ketersediaan = 'tersedia'
                 pb.save()
-                print(pb.buku)
-                print(pb.id)
-        # pinjam_buku = get_object_or_404(PinjamBuku, id=pinjam_buku_id)
-        # pinjam_buku = PinjamBuku.objects.get(buku=pinjam_buku_title)
                 pb.delete()
-        # print(pinjam_buku.buku)
-        # print(pinjam_buku.id)
-        # if pinjam_buku.buku:
-        #     pinjam_buku.ketersediaan = 'tersedia'
-        #     pinjam_buku.save()
-
-        # pinjam_buku.delete()
 
         return redirect('peminjaman_buku:pinjam_buku_list') 
 
@@ -82,8 +73,6 @@ def pinjam_buku_list(request):
     return render(request, 'pinjam_buku_list.html', context)
 
 def list_buku_flutter(request, uname):
-    
-    # print(uname)
     data_item = PinjamBuku.objects.all()
     for data in data_item:
         if data.pengguna.username == uname:
@@ -94,15 +83,6 @@ def list_buku_flutter(request, uname):
             data = []
 
     return HttpResponse(serializers.serialize("json", data), content_type="application/json")
-    # print(request.user)
-    # pinjam = PinjamBuku.objects.filter(pengguna=request.user)
-    # # pinjam = PinjamBuku.objects.all()
-    # return HttpResponse(serializers.serialize('json', pinjam))
-    # context = {
-    #     'borrowed_books': borrowed_books,
-    # }
-    # return render(request, 'pinjam_buku_list.html', context)
-
 
 def show_detail(request, book_id):
     book = get_object_or_404(Book, id=book_id)
@@ -110,29 +90,26 @@ def show_detail(request, book_id):
 
 @csrf_exempt
 def create_pinjam_buku(request):
+    date_format = "%Y-%m-%d"  
+
     if request.method == 'POST':
-        try:
-            # Mengambil data dari permintaan POST
-            data = json.loads(request.body)
-            username = data['username']
-            buku = data['buku']
-            tanggal_peminjaman = data['tanggal_peminjaman']
-            tanggal_pengembalian = data['tanggal_pengembalian']
 
-            # Mendapatkan objek User berdasarkan username
-            user = User.objects.get(username=username)
+        data = json.loads(request.body)
 
-            # Membuat objek PinjamBuku
-            pinjam_buku = PinjamBuku.objects.create(
-                pengguna=user,
-                buku=buku,
-                tanggal_peminjaman=tanggal_peminjaman,
-                tanggal_pengembalian=tanggal_pengembalian,
-                status_acc=False
-            )
+        new_item = PinjamBuku.objects.create(
+            pengguna = request.user,
+            buku = data['buku'],
+            tanggal_peminjaman = datetime.now(),
+            tanggal_pengembalian = datetime.now() + timedelta(days=2),
+        )
 
-            return JsonResponse({'status': 'success', 'message': 'PinjamBuku created successfully'})
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': str(e)})
+        new_item.save()
 
-    return JsonResponse({'status': 'error', 'message': 'Invalid method'})
+        return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
+
+
+
+
+
