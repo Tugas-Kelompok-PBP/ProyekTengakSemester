@@ -2,6 +2,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+import json
+from django.contrib.auth.models import User
 
 # Create your views here.
 @csrf_exempt
@@ -41,24 +43,43 @@ def logout_user(request):
         "status": False,
         "message": "Logout gagal."
         }, status=401)
-    
+
 @csrf_exempt
 def register(request):
-    form = UserCreationForm()
-    if request.method == "POST":
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return JsonResponse({
-                "message": "Akun berhasil dibuat",
-            }, status=200)
-        else:
-            return JsonResponse({
-                "status": False,
-                "message": "Akun gagal dibuat"
-            }, status=401)
+    if request.method == 'POST':
+        # print(request.body)
+        data = json.loads(request.body)
+
+        username = data["username"]
+        password1 = data["password1"]
+        password2 = data["password2"]
+
+        if password1 != password2:
+            return JsonResponse({'status': 'failed', 'message': 'Pasword Tidak Sama'})
+
+        new_user = User.objects.create_user(username = username, password = password1)
+        new_user.save()
+        return JsonResponse({"status": "success"}, status=200)
     else:
-         return JsonResponse({
-            "status": False,
-            "message": "Akun gagal dibuat"
-        }, status=401)
+        return JsonResponse({"status": "error"}, status=401)
+
+# @csrf_exempt
+# def register(request):
+#     form = UserCreationForm()
+#     if request.method == "POST":
+#         form = UserCreationForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             return JsonResponse({
+#                 "message": "Akun berhasil dibuat",
+#             }, status=200)
+#         else:
+#             return JsonResponse({
+#                 "status": False,
+#                 "message": "Akun gagal dibuat"
+#             }, status=401)
+#     else:
+#          return JsonResponse({
+#             "status": False,
+#             "message": "Akun gagal dibuat"
+#         }, status=401)
