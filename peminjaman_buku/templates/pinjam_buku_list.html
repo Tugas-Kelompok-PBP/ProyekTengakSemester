@@ -109,7 +109,7 @@
               <p class="card-text">Tanggal Peminjaman: {{ pinjam_buku.tanggal_peminjaman }}</p>
               <p class="card-text">Tanggal Pengembalian: {{ pinjam_buku.tanggal_pengembalian }}</p>
               <p class="card-text">Status: {% if pinjam_buku.status_acc %}Diterima{% else %}Menunggu persetujuan{% endif %}</p>
-              <a href="{% url 'peminjaman_buku:kembalikan_buku' pinjam_buku.id %}">
+              <a href="{% url 'peminjaman_buku:kembalikan_buku' pinjam_buku.buku %}">
                 <button class="btn" onclick="openPopup()">Kembalikan</button>
                 <div class="popup" id="popup">
                   <h2>Buku berhasil dikembalikan</h2>
