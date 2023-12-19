@@ -99,6 +99,7 @@
   </div>
   <br>
   <div class="container">
+    
     <div class="card-container">
       <div class="card-grid">
         {% if borrowed_books %}
@@ -109,8 +110,8 @@
               <p class="card-text">Tanggal Peminjaman: {{ pinjam_buku.tanggal_peminjaman }}</p>
               <p class="card-text">Tanggal Pengembalian: {{ pinjam_buku.tanggal_pengembalian }}</p>
               <p class="card-text">Status: {% if pinjam_buku.status_acc %}Diterima{% else %}Menunggu persetujuan{% endif %}</p>
-              <a href="{% url 'peminjaman_buku:kembalikan_buku' pinjam_buku.id %}">
-                <button class="btn" onclick="openPopup()">Kembalikan</button>
+              <a href="{% url 'peminjaman_buku:kembalikan_buku' pinjam_buku.buku %}">
+                <button class="btn" id={ {pinjam_buku.buku} } onclick="openPopup()">Kembalikan</button>
                 <div class="popup" id="popup">
                   <h2>Buku berhasil dikembalikan</h2>
                   <p>Terima kasih dan semangat membaca!</p>

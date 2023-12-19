@@ -12,29 +12,8 @@
         </div>
     </div>
 
-    <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel">Tambahkan Ruangan</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="form" onsubmit="return false;">
-						{% csrf_token %}
-						{{ form.nomor.label_tag }} {{ form.nomor }}<br>
-						{{ form.ketersediaan.label_tag }} {{ form.ketersediaan }}<br>
-					</form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="button_add" data-bs-dismiss="modal">Add Product</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
+   
+   
     <script>
         async function getProducts() {
             return fetch("{% url 'sistem_manajemen:get_peminjaman_json' %}").then((res) => res.json())
@@ -46,7 +25,7 @@
             const products = await getProducts();
             let htmlString = `<thead>
                 <tr>
-					<th>Id_buku</th>
+					<th>Judul  buku</th>
                     <th>Tanggal Pinjam</th>
                     <th>Tanggal Pembelian</th>
                     <th>Status Penerimaan</th>
@@ -55,12 +34,10 @@
                 </thead>
                 <tbody>`;
 
-            products.forEach((item) => {
+            products.forEach((item) => { 
 				const text = item.fields.buku;
-				const match = text.match(/\((\d+)\)/);
-				const number = match[1];
                 htmlString += `<tr>
-					<td>${number}</td>
+					<td>${item.fields.buku}</td>
 					<td>${item.fields.tanggal_peminjaman}</td>
                     <td>${item.fields.tanggal_pengembalian}</td>
                     <td>${item.fields.status_acc}</td>

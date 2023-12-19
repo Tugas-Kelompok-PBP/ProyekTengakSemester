@@ -1,5 +1,5 @@
 from django.urls import path
-from sistem_manajemen.views import show_sistem, get_ruangan_json, add_ruangan_ajax, show_sistem_ruangan, show_sistem_buku, get_buku_json, ganti_status_ketersediaan, show_peminjaman, get_peminjaman_json, ganti_status_peminjaman, ganti_status_ketersediaan_buku
+from sistem_manajemen.views import show_sistem, get_ruangan_json, add_ruangan_ajax, show_sistem_ruangan, show_sistem_buku, get_buku_json, ganti_status_ketersediaan, show_peminjaman, get_peminjaman_json, ganti_status_peminjaman, ganti_status_ketersediaan_buku, create_ruangan_flutter
 
 app_name = 'sistem_manajemen'
 
@@ -15,4 +15,5 @@ urlpatterns = [
     path('get-peminjaman/', get_peminjaman_json, name='get_peminjaman_json'),
     path('edit_peminjaman/<int:id>', ganti_status_peminjaman, name='edit_peminjaman'),
     path('edit_ketersediaan_buku/<int:id>', ganti_status_ketersediaan_buku, name='edit_ketersediaan_buku'),
+    path('create-flutter/', create_ruangan_flutter, name='create_ruangan_flutter'),
 ]

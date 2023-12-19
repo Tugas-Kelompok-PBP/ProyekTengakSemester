@@ -101,11 +101,12 @@
                 <div class="card">
                     <h5 class="card-title">{{ book.title }}</h5>
                     <p class="card-text">Genre: {{ book.genre }}</p>
+                    <p class="card-text">Id: {{ book.id }}</p>
                     <p class="card-text">Summary: {{ book.summary|truncatechars:120 }}</p>
                     <button type="submit" class="btn" onclick="pinjamBuku('{{ book.id }}')">Pinjam</button>
-                    <a href="{% url 'peminjaman_buku:show_ulasan' book.id %}">
-                        <button type="submit" class="btn">Lihat Ulasan</button>
-                    </a>>
+                    <a href="{% url 'peminjaman_buku:show_detail' book.id %}"
+                        <button type="submit" class="btn">Lihat Detail</button>
+                    </a>
                     <div class="popup" id="popup">
                         <h2>Buku berhasil dipinjam</h2>
                         <p>Silakan tunggu proses persetujuan admin</p>

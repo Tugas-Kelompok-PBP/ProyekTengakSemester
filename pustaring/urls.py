@@ -25,5 +25,6 @@ urlpatterns = [
     path('customer_service/', include("customer_service.urls")),
     path('', include("beranda.urls")),
     path('ulasan/', include("ulasan.urls")),
-    path('peminjaman_buku/', include("peminjaman_buku.urls"))
+    path('peminjaman_buku/', include("peminjaman_buku.urls")),
+    path('auth/', include('authentication.urls')),
 ]

@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="card-title">Ulasan Buku</h1>
+                <h2>Judul Buku: {{ book.title }}</h2>
+
+                <!-- Daftar Ulasan Pengguna -->
+                <h3>Ulasan Pengguna: </h3>
+                <div class="row" id="user-reviews"></div>
+
+                <!-- Tombol kembali ke Detail Buku -->
+                <a href="{% url 'peminjaman_buku:show_detail' book.id %}">
+                    <button class="btn btn-secondary">Back</button>
+                </a>
+
+                <!-- Tombol untuk menambah ulasan menggunakan AJAX -->
+                <button type="button" class="btn custom-btn-color" id="add-review-ajax" data-bs-toggle="modal" data-bs-target="#reviewModal" style="background-color: #345941; color: #ffffff; padding: 5px 15px; border: none; border-radius: 5px; margin-right: 5px;">
+                    Add Review by AJAX
+                </button>
+            </div>
+        </div>
+
+        <!-- Formulir untuk menambahkan ulasan menggunakan modal -->
+        <div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="reviewModalLabel">Tambahkan Ulasan Anda</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        
+                        <form id="review_form_modal">
+                            {% csrf_token %}
+                            <p>Oleh: {{ request.user.username }}</p>
+                            <label for="rating_modal">Rating:</label>
+                            <select id="rating_modal" name="rating" required>
+                                <option value="5">★★★★★</option>
+                                <option value="4">★★★★☆</option>
+                                <option value="3">★★★☆☆</option>
+                                <option value="2">★★☆☆☆</option>
+                                <option value="1">★☆☆☆☆</option>
+                            </select>
+                            <label for="review_text_modal">Ulasan Anda:</label>
+                            <textarea id="review_text_modal" name="review_text" required></textarea>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                        {% if request.user.is_authenticated %}
+                            <button type="button" class="btn btn-primary" id="submit_review" data-bs-dismiss="modal">Kirim Ulasan</button>
+                        {% else %}
+                            <a href="{% url 'beranda:login' %}" class="btn btn-primary">Login untuk menambahkan ulasan</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <script>
+            
+            // Fungsi untuk mendapatkan ulasan buku
+            async function getReviews() {
+                let url = `{% url 'ulasan:get_reviews_json' book.id %}`;
+                return fetch(url).then((res) => res.json());
+            }
+            
+            async function getUserReviews() {
+                const userReviews = fetch("{% url 'ulasan:get_user_review' book.pk %}").then((res) => res.json());
+                console.log(userReviews)
+
+                return userReviews;
+            }
+            // Fungsi untuk menampilkan ulasan buku
+            async function refreshReviews() {
+                const reviewsContainer = document.getElementById("user-reviews");
+                reviewsContainer.innerHTML = '';
+
+                const reviews = await getReviews();
+
+                if (reviews.length === 0) {
+                    // If no reviews are available, display a message
+                    const noReviewMessage = document.createElement('p');
+                    noReviewMessage.textContent = 'Ulasan belum tersedia';
+                    reviewsContainer.appendChild(noReviewMessage);
+                } else {
+                    // If there are reviews, display each review in a card
+                    reviews.forEach((review) => {
+                        const starRating = generateStarRating(review.rating);
+
+                        // Create a card for each review
+                        const cardDiv = document.createElement('div');
+                        cardDiv.classList.add('card', 'mb-3');
+                        const cardBodyDiv = document.createElement('div');
+                        cardBodyDiv.classList.add('card-body');
+
+                        // Populate the card body with content
+                        cardBodyDiv.innerHTML = `
+                            <p><strong>Oleh:</strong> ${review.user_name}</p>
+                            <p><strong>Rating:</strong> ${starRating} (${review.rating} stars)</p>
+                            <p><strong>Ulasan:</strong> ${review.review_text}</p>
+                            <p><strong>Date Added:</strong> ${review.date_added}</p>
+                        `;
+
+                        // Append the card body to the card
+                        cardDiv.appendChild(cardBodyDiv);
+
+                        // Append the card to the container
+                        reviewsContainer.appendChild(cardDiv);
+                    });
+                }
+            }
+            refreshReviews()
+
+            function addReview() {
+                getUserReviews().then((reviews) => {
+                    if (reviews.length > 0) {
+                        alert("Anda sudah memberikan ulasan untuk buku ini.");
+                        document.getElementById("review_form_modal").reset();
+                    } else {
+                        fetch("{% url 'ulasan:add_review_ajax' book.id %}", {
+                            method: "POST",
+                            body: new FormData(document.querySelector('#review_form_modal'))
+                        }).then((response) => {
+                            if (response.ok) {
+                                // Review added successfully, refresh reviews
+                                refreshReviews();
+                                document.getElementById("review_form_modal").reset();
+                            } else {
+                                // Handle the case when review submission fails
+                                alert("Gagal menambahkan ulasan. Silakan coba lagi.");
+                            }
+                        });
+                    }
+                });
+
+                return false;
+            }
+
+            document.getElementById("submit_review").onclick = addReview
+          
+    
+        
+            function generateStarRating(starCount) {
+                const filledStars = '<i class="fa fa-star"></i>'.repeat(starCount);
+                const emptyStars = '<i class="fa fa-star-o"></i>'.repeat(5 - starCount);
+                return filledStars + emptyStars;
+            }
+
+            
+        </script>
+        
+{% endblock content %}
