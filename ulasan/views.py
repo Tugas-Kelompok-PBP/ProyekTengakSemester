@@ -9,18 +9,15 @@ from book.models import Book
 
 # Create your views here.
 
-@login_required(login_url='/login')
-def show_ulasan(request, book_id=None):
-    book = None
-    reviews = None
-    if book_id is not None:
-        try:
-            book = Book.objects.get(pk=book_id)
-            reviews = UserReview.objects.filter(book=book)
-        except Book.DoesNotExist:
-            # Tangani jika buku tidak ditemukan
-            book = None
-    return render(request, "ulasan.html", {'book': book, 'reviews': reviews})
+def show_peminjaman_buku(request):
+    books = Book.objects.filter(ketersediaan='tersedia')
+
+    context = {
+        'books': books,
+    }
+    
+    return render(request,'peminjaman_buku.html', context)
+
 
 @csrf_exempt
 def add_review_ajax(request, book_id):
@@ -38,15 +35,8 @@ def add_review_ajax(request, book_id):
 
 def get_reviews_json(request, book_id):
     reviews = UserReview.objects.filter(book_id=book_id)
-    review_data = []
-    for review in reviews:
-        review_data.append({
-            'user_name': review.user_name,
-            'rating': review.rating,
-            'review_text': review.review_text,
-            'date_added' : review.date_added,
-        })
-    return HttpResponse(serializers.serialize('json', reviews))
+    data = [{'user_name': reviews.user_name, 'rating': reviews.rating, 'review_text': reviews.review_text, 'date_added': reviews.date_added} for review in reviews]
+    return JsonResponse(data, safe=False)
 
 @login_required(login_url='/login')
 def delete_review(request, review_id):
