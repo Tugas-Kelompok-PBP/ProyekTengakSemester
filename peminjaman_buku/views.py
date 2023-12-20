@@ -92,10 +92,17 @@ def show_detail(request, book_id):
 def create_pinjam_buku(request):
     date_format = "%Y-%m-%d"  
 
+
     if request.method == 'POST':
 
         data = json.loads(request.body)
+        book_title = data.get('buku', '')
 
+        # Check if the book title already exists
+        existing_item = PinjamBuku.objects.filter(buku__iexact=book_title, pengguna=request.user).first()
+        if existing_item:
+            return JsonResponse({"status": "duplicate", "message": f"Book with title '{book_title}' is already borrowed by the user."}, status=400)
+        
         new_item = PinjamBuku.objects.create(
             pengguna = request.user,
             buku = data['buku'],
