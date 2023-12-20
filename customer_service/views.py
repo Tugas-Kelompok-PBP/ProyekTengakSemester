@@ -54,6 +54,7 @@ def add_report_flutter(request):
         data = json.loads(request.body)
         new_report = Report.objects.create(
             user = request.user,
+            username = data.get('username'),
             losts = json.dumps(data.get('losts', [])),
             brokens = json.dumps(data.get('brokens', [])),
             status = 'REQUESTED',
@@ -124,6 +125,7 @@ def add_complaint_flutter(request):
         data = json.loads(request.body)
         new_complain = Complaint.objects.create(
             user = request.user,
+            username = data.get('username'),
             description = data.get("description")
         )
         new_complain.save()

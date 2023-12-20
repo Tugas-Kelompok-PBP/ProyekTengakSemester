@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 
 class Report(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    username = models.CharField(max_length=500, default="Aninom")
     losts = models.TextField(blank=True, null=True)
     brokens = models.TextField(blank=True, null=True)
     report_date = models.DateField(auto_now_add=True)
@@ -26,6 +27,7 @@ class Report(models.Model):
 
 class Complaint(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    username = models.CharField(max_length=500, default="Anonim")
     description = models.TextField()
     report_date = models.DateField(auto_now_add=True)
     isRead = models.BooleanField(default=False)
