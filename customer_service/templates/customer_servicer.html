@@ -17,7 +17,6 @@
             htmlString += `\n<div class="card border-primary mb-3" style="width: 12rem; text-align: center">
                 <div class="card-body text-primary">
                     <h6 class="card-text">Laporan ${report.pk}</h6>
-                    <h7 class="card-text">${getUser(report.fields.user).fields.username}</h7>
                     <h7 class="card-text">${report.fields.report_date}</h7>`
             if (report.fields.status === 'REQUESTED') {
                 htmlString += `\n        <button type="button" class="btn btn-primary" id="button_add" data-bs-dismiss="modal" onClick="confirm(${report.pk})">Konfirmasi</button>`

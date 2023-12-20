@@ -1,7 +1,6 @@
 import datetime
 import json
 from book.models import Book
-from peminjaman_buku.models import PinjamBuku
 from customer_service.models import Report, Complaint
 from django.urls import reverse
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
@@ -28,7 +27,7 @@ def get_reports_json(request):
     reports = Report.objects.filter(user=request.user)
     return HttpResponse(serializers.serialize('json', reports))
 
-def get_books_json_by_ids(request, ids):
+def get_book(request):
     books = Book.objects.filter(pk__in=ids)
     return HttpResponse(serializers.serialize('json', books))
 
@@ -75,6 +74,18 @@ def confirm_report(request):
     return HttpResponseNotFound()
 
 @csrf_exempt
+def confirm_report_flutter(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        report = Report.objects.get(pk=data.get("id"))
+        report.status = 'CONFIRMED'
+        report.message = 'Dikonformasi, menunggu pembayaran denda'
+        report.save()
+        return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
+
+@csrf_exempt
 def finish_report(request):
     if request.method == 'POST':
         report = Report.objects.get(pk=request.GET.get("id"))
@@ -85,14 +96,58 @@ def finish_report(request):
     return HttpResponseNotFound()
 
 @csrf_exempt
+def finish_report_flutter(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        report = Report.objects.get(pk=data.get("id"))
+        report.status = 'DONE'
+        report.message = 'Laporan selesai'
+        report.save()
+        return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
+
+@csrf_exempt
 def add_complaint(request):
     if request.method == 'POST':
         user = request.user
-        description = request.POST.get("description")
+        description = request.GET.get("description")
         new_complaint = Complaint(user=user, description=description)
         new_complaint.save()
         return HttpResponse(b"CREATED", status=201)
     return HttpResponseNotFound()
+
+@csrf_exempt
+def add_complaint_flutter(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        new_complain = Complaint.objects.create(
+            user = request.user,
+            description = data.get("description")
+        )
+        new_complain.save()
+        return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
+
+@csrf_exempt
+def read_complaint(request):
+    if request.method == 'POST':
+        complaint = Complaint.objects.get(pk=request.GET.get("id"))
+        complaint.isRead = True
+        complaint.save()
+        return HttpResponse(b"CREATED", status=201)
+    return HttpResponseNotFound()
+
+@csrf_exempt
+def read_complaint_flutter(request):
+    if request.method == 'POST':
+        complaint = Complaint.objects.get(pk=json.loads(request.body).get("id"))
+        complaint.isRead = True
+        complaint.save()
+        return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
 
 def get_user(request):
     if request.method == "POST":
@@ -102,6 +157,10 @@ def get_user(request):
 
 def show_json(request):
     data = Report.objects.all()
+    return HttpResponse(serializers.serialize("json", data), content_type="application/json")
+
+def show_complaint_json(request):
+    data = Complaint.objects.all()
     return HttpResponse(serializers.serialize("json", data), content_type="application/json")
 
 def show_json_by_user(request):

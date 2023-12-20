@@ -24,13 +24,8 @@ class Report(models.Model):
     def get_brokens(self):
         return json.loads(self.brokens)
 
-    def set_status(self, new_status):
-        self.status = new_status
-
-    def set_message(self, new_message):
-        self.message = new_message
-
 class Complaint(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     description = models.TextField()
     report_date = models.DateField(auto_now_add=True)
+    isRead = models.BooleanField(default=False)

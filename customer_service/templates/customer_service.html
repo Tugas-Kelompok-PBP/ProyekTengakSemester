@@ -53,7 +53,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                <button type="button" class="btn btn-primary" id="button_add" data-bs-dismiss="modal">Buat Aduan/Saran</button>
+                <button type="button" class="btn btn-primary" id="button_add" data-bs-dismiss="modal" onclick="addComplaint()">Buat Aduan/Saran</button>
             </div>
         </div>
     </div>
@@ -111,4 +111,13 @@
         return false
     }
     document.getElementById("button_add").onclick = addReport
+
+    function addComplaint() {
+        var desc = document.getElementById('description').value;
+        if (desc !== "") {
+            fetch(`{% url 'customer_service:add_complaint' %}?description=${desc}`, {
+                method: "POST"
+            })
+        }
+    }
 </script>{% endblock content %}
