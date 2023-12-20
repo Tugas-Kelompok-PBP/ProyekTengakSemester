@@ -28,8 +28,9 @@ def get_reports_json(request):
     return HttpResponse(serializers.serialize('json', reports))
 
 def get_book(request):
-    books = Book.objects.filter(pk__in=ids)
-    return HttpResponse(serializers.serialize('json', books))
+    id = json.loads(request.body).get('id')
+    book = Book.objects.get(pk=id)
+    return HttpResponse(serializers.serialize('json', book))
 
 @csrf_exempt
 def add_report(request):
